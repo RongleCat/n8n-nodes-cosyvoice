@@ -149,18 +149,15 @@ export async function synthesizeSpeech(
 		ws.on('message', (data: Buffer, isBinary: boolean) => {
 			if (isBinary) {
 				// 二进制音频数据
-				console.log(`[CosyVoice WS] Received binary chunk: ${data.length} bytes`);
 				audioChunks.push(Buffer.from(data));
 			} else {
 				// JSON 事件消息
 				try {
 					const message: WSEventMessage = JSON.parse(data.toString());
-					console.log(`[CosyVoice WS] Received event: ${message.header.event}`);
 
 					switch (message.header.event) {
 						case 'task-started':
 							// 任务已启动，发送文本
-							console.log(`[CosyVoice WS] Task started, sending text (length: ${params.text.length})`);
 							sendContinueTask(ws, taskId, params.text);
 							// 发送完文本后立即发送 finish-task
 							sendFinishTask(ws, taskId);
@@ -173,12 +170,10 @@ export async function synthesizeSpeech(
 							if (message.payload.usage?.characters) {
 								characters = message.payload.usage.characters;
 							}
-							console.log(`[CosyVoice WS] Result generated - RequestID: ${requestUuid}, Characters: ${characters}`);
 							break;
 
 						case 'task-finished':
 							// 任务完成
-							console.log(`[CosyVoice WS] Task finished - Total audio chunks: ${audioChunks.length}`);
 							if (message.payload.output?.sentence?.words) {
 								words = message.payload.output.sentence.words.map((w) => ({
 									text: w.text,
@@ -195,7 +190,6 @@ export async function synthesizeSpeech(
 
 						case 'task-failed':
 							// 任务失败
-							console.error(`[CosyVoice WS] Task failed: ${message.header.error_message}`);
 							hasError = true;
 							ws.close();
 							if (!isSettled) {
@@ -208,23 +202,20 @@ export async function synthesizeSpeech(
 							}
 							break;
 					}
-				} catch (error) {
+				} catch {
 					// JSON 解析失败，忽略
-					console.error('[CosyVoice WS] Failed to parse WebSocket message:', error);
 				}
 			}
 		});
 
 		// 连接建立后发送 run-task
 		ws.on('open', () => {
-			console.log(`[CosyVoice WS] Connection opened, sending run-task for model: ${params.model}, voice: ${params.voice}`);
 			sendRunTask(ws, taskId, params);
 		});
 
 		// 连接关闭时返回结果
 		ws.on('close', () => {
 			clearTimeout(timeout);
-			console.log(`[CosyVoice WS] Connection closed - hasError: ${hasError}, audioChunks: ${audioChunks.length}, isSettled: ${isSettled}`);
 
 			// 如果已经 settled（比如在 task-failed 中 reject 了），不再处理
 			if (isSettled) {
@@ -235,9 +226,6 @@ export async function synthesizeSpeech(
 
 			// 如果没有错误，返回结果（即使音频为空）
 			if (!hasError) {
-				const totalBytes = audioChunks.reduce((sum, chunk) => sum + chunk.length, 0);
-				console.log(`[CosyVoice WS] Resolving with audio: ${totalBytes} bytes from ${audioChunks.length} chunks`);
-
 				if (audioChunks.length === 0) {
 					// 没有收到任何音频数据，这是异常情况
 					reject(new Error('No audio data received from CosyVoice API'));

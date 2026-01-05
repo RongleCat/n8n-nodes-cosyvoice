@@ -75,7 +75,7 @@ export const cosyVoiceDescription: INodeProperties[] = [
 		name: 'enable_ssml',
 		type: 'boolean',
 		default: false,
-		description: '是否启用 SSML 模式。启用后,text 字段应输入 SSML 格式的文本',
+		description: 'Whether to enable SSML mode. When enabled, the text field should contain SSML formatted text.',
 	},
 	{
 		displayName: 'Additional Options',
@@ -97,6 +97,34 @@ export const cosyVoiceDescription: INodeProperties[] = [
 				default: 'wav',
 			},
 			{
+				displayName: 'Binary Field Name',
+				name: 'binaryPropertyName',
+				type: 'string',
+				default: 'data',
+				description: 'The field name for the output binary data',
+			},
+			{
+				displayName: 'File Name',
+				name: 'fileName',
+				type: 'string',
+				default: '',
+				placeholder: 'e.g. my_audio.mp3',
+				description: 'The name of the output file (including extension). Leave empty to auto-generate.',
+			},
+			{
+				displayName: 'Instruction',
+				name: 'instruction',
+				type: 'string',
+				default: '',
+			},
+			{
+				displayName: 'Pitch',
+				name: 'pitch',
+				type: 'number',
+				typeOptions: { minValue: 0.5, maxValue: 2.0, step: 0.1, numberPrecision: 1 },
+				default: 1,
+			},
+			{
 				displayName: 'Sample Rate',
 				name: 'sampleRate',
 				type: 'options',
@@ -111,11 +139,11 @@ export const cosyVoiceDescription: INodeProperties[] = [
 				default: 22050,
 			},
 			{
-				displayName: 'Volume',
-				name: 'volume',
+				displayName: 'Seed',
+				name: 'seed',
 				type: 'number',
-				typeOptions: { minValue: 0, maxValue: 100 },
-				default: 50,
+				typeOptions: { minValue: 0, maxValue: 65535 },
+				default: 0,
 			},
 			{
 				displayName: 'Speed Rate',
@@ -125,45 +153,17 @@ export const cosyVoiceDescription: INodeProperties[] = [
 				default: 1,
 			},
 			{
-				displayName: 'Pitch',
-				name: 'pitch',
+				displayName: 'Volume',
+				name: 'volume',
 				type: 'number',
-				typeOptions: { minValue: 0.5, maxValue: 2.0, step: 0.1, numberPrecision: 1 },
-				default: 1,
-			},
-			{
-				displayName: 'Instruction',
-				name: 'instruction',
-				type: 'string',
-				default: '',
+				typeOptions: { minValue: 0, maxValue: 100 },
+				default: 50,
 			},
 			{
 				displayName: 'Word Timestamp',
 				name: 'wordTimestampEnabled',
 				type: 'boolean',
 				default: false,
-			},
-			{
-				displayName: 'Seed',
-				name: 'seed',
-				type: 'number',
-				typeOptions: { minValue: 0, maxValue: 65535 },
-				default: 0,
-			},
-			{
-				displayName: 'Binary Field Name',
-				name: 'binaryPropertyName',
-				type: 'string',
-				default: 'data',
-				description: '输出二进制数据的字段名称',
-			},
-			{
-				displayName: 'File Name',
-				name: 'fileName',
-				type: 'string',
-				default: '',
-				placeholder: 'e.g. my_audio.mp3',
-				description: '输出文件的名称（包含扩展名），留空则自动生成',
 			},
 		],
 	},
@@ -173,7 +173,7 @@ export class CosyVoice implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'CosyVoice',
 		name: 'cosyVoice',
-		icon: { light: 'file:../../icons/cosyvoice.svg', dark: 'file:../../icons/cosyvoice.svg' },
+		icon: 'file:../../icons/cosyvoice.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter.model + " - " + $parameter.voice}}',
@@ -252,7 +252,7 @@ export class CosyVoice implements INodeType {
 				}
 
 				// 获取参数
-				let text = this.getNodeParameter('text', i, '') as string;
+				const text = this.getNodeParameter('text', i, '') as string;
 				const model = this.getNodeParameter('model', i, 'cosyvoice-v3-flash') as string;
 				const voiceParam = this.getNodeParameter('voice', i) as { mode: string; value: string } | string;
 				const voice = typeof voiceParam === 'string' ? voiceParam : voiceParam.value;
