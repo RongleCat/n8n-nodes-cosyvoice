@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-cosyvoice",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Aliyun CosyVoice TTS Node for n8n - 文字转语音节点",
   "license": "MIT",
   "homepage": "https://github.com/ronglecat/n8n-nodes-cosyvoice",
@@ -14,7 +14,10 @@
     "chinese",
     "voice"
   ],
-  "author": { "name": "ronglecat", "email": "ronglecat@163.com" },
+  "author": {
+    "name": "ronglecat",
+    "email": "ronglecat@163.com"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ronglecat/n8n-nodes-cosyvoice.git"
@@ -28,12 +31,18 @@
     "release": "n8n-node release",
     "prepublishOnly": "n8n-node prerelease"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "n8n": {
     "n8nNodesApiVersion": 1,
     "strict": false,
-    "credentials": ["dist/credentials/CosyVoiceApi.credentials.js"],
-    "nodes": ["dist/nodes/CosyVoice/CosyVoice.node.js"]
+    "credentials": [
+      "dist/credentials/CosyVoiceApi.credentials.js"
+    ],
+    "nodes": [
+      "dist/nodes/CosyVoice/CosyVoice.node.js"
+    ]
   },
   "devDependencies": {
     "@n8n/node-cli": "*",
@@ -44,5 +53,7 @@
     "release-it": "^19.0.4",
     "typescript": "5.9.2"
   },
-  "peerDependencies": { "n8n-workflow": "*" }
+  "peerDependencies": {
+    "n8n-workflow": "*"
+  }
 }
