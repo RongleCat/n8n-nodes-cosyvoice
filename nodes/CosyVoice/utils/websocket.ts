@@ -38,6 +38,8 @@ export interface TTSRequestParams {
 	languageHints?: string[];
 	/** Opus 码率 */
 	bitRate?: number;
+	/** 超时时间（毫秒），默认 180000（3 分钟） */
+	timeoutMs?: number;
 }
 
 /**
@@ -124,11 +126,12 @@ export async function synthesizeSpeech(
 			},
 		});
 
-		// 超时控制（60秒）
+		// 超时控制（默认 3 分钟）
+		const timeoutMs = params.timeoutMs ?? 180000;
 		const timeout = setTimeout(() => {
 			ws.close();
-			reject(new Error('WebSocket connection timeout after 60 seconds'));
-		}, 60000);
+			reject(new Error(`WebSocket connection timeout after ${timeoutMs / 1000} seconds`));
+		}, timeoutMs);
 
 		// 错误标记，避免重复 reject
 		let hasError = false;

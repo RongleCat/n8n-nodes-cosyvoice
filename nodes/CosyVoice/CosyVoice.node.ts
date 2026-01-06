@@ -160,6 +160,14 @@ export const cosyVoiceDescription: INodeProperties[] = [
 				default: 50,
 			},
 			{
+				displayName: 'WebSocket Timeout (seconds)',
+				name: 'timeout',
+				type: 'number',
+				typeOptions: { minValue: 30, maxValue: 600 },
+				default: 180,
+				description: 'WebSocket connection timeout in seconds. Increase for long text.',
+			},
+			{
 				displayName: 'Word Timestamp',
 				name: 'wordTimestampEnabled',
 				type: 'boolean',
@@ -288,7 +296,7 @@ export class CosyVoice implements INodeType {
 						text,
 						model,
 						voice,
-						format: (options.format as 'mp3' | 'wav' | 'pcm' | 'opus') || 'mp3',
+						format: (options.format as 'mp3' | 'wav' | 'pcm' | 'opus') || 'wav',
 						sampleRate: options.sampleRate as number,
 						volume: options.volume as number,
 						rate: options.rate as number,
@@ -297,6 +305,7 @@ export class CosyVoice implements INodeType {
 						instruction: options.instruction as string,
 						wordTimestampEnabled: options.wordTimestampEnabled as boolean,
 						seed: options.seed as number,
+						timeoutMs: options.timeout ? (options.timeout as number) * 1000 : undefined,
 					},
 					apiKey,
 				);
@@ -307,7 +316,7 @@ export class CosyVoice implements INodeType {
 				);
 
 				// 构建返回数据
-				const format = (options.format as 'mp3' | 'wav' | 'pcm' | 'opus') || 'mp3';
+				const format = (options.format as 'mp3' | 'wav' | 'pcm' | 'opus') || 'wav';
 				const mimeType = `audio/${format}`;
 
 				// 获取自定义配置
