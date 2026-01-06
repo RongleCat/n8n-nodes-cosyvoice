@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-cosyvoice",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Aliyun CosyVoice TTS Node for n8n - 文字转语音节点",
   "license": "MIT",
   "homepage": "https://github.com/ronglecat/n8n-nodes-cosyvoice",
