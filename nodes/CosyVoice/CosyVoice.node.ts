@@ -160,7 +160,7 @@ export const cosyVoiceDescription: INodeProperties[] = [
 				default: 50,
 			},
 			{
-				displayName: 'WebSocket Timeout (seconds)',
+				displayName: 'WebSocket Timeout (Seconds)',
 				name: 'timeout',
 				type: 'number',
 				typeOptions: { minValue: 30, maxValue: 600 },
